@@ -2,6 +2,7 @@
 package com.senac.aula_api.domain.entities;
 
 import com.senac.aula_api.domain.valueobjects.CPF;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 import java.math.BigDecimal;

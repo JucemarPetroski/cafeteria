@@ -1,5 +1,6 @@
 package com.senac.aula_api.domain.entities;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
