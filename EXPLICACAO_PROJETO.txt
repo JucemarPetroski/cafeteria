@@ -1,0 +1,44 @@
+# Explicação do Projeto Cafeteria
+
+Este projeto é uma API para gerenciamento de uma cafeteria, construída com Spring Boot. Abaixo estão as principais partes do código e suas funções:
+
+## Controllers
+
+- **ProdutoController**: Gerencia os produtos do cardápio (CRUD). Permite listar, criar, editar e remover produtos.
+- **PedidoController**: Gerencia os pedidos feitos pelos clientes. Permite criar, listar, editar e remover pedidos, associando produtos a cada pedido.
+- **PagamentoController**: Gerencia os pagamentos dos pedidos. Permite registrar, consultar, editar e remover pagamentos.
+- **RelatorioController**: Fornece relatórios agregados, como total de vendas e produtos mais vendidos.
+- **MenuController, ClienteController, AdministradorController, NotificacaoController**: Gerenciam recursos administrativos, cadastro de clientes, administradores e envio de notificações por e-mail/SMS.
+
+## Entidades
+
+- **Produto**: Representa um item do cardápio, com nome, descrição e preço.
+- **Pedido**: Representa um pedido feito por um cliente, contendo produtos, status e cliente associado.
+- **Pagamento**: Representa o pagamento de um pedido, com valor, método e status.
+- **Cliente, Administrador**: Representam usuários do sistema, com dados específicos.
+- **NotificacaoEmail, NotificacaoSms**: Permitem envio de mensagens para clientes via e-mail ou SMS.
+
+## Repositórios
+
+- Interfaces que estendem JpaRepository para cada entidade, permitindo operações de banco de dados sem necessidade de implementação manual.
+
+## DTOs
+
+- **NotificacaoEmailRequestDto, NotificacaoSmsRequestDto**: Facilitam o envio de dados para notificações, separando os dados recebidos dos modelos internos.
+
+## Configurações
+
+- **SwaggerConfiguration**: Gera documentação automática dos endpoints da API, facilitando testes e integração.
+- **CorsConfig**: Habilita CORS globalmente, permitindo que o frontend acesse a API de qualquer origem.
+
+## Integração
+
+- Todos os endpoints retornam e recebem dados em formato JSON, prontos para consumo por aplicações frontend.
+- A documentação Swagger está disponível para consulta dos endpoints e exemplos de requisições.
+
+## Observações
+
+- O projeto utiliza JPA para persistência de dados, com dependências já configuradas no `pom.xml`.
+- O backend está preparado para integração com frontend, seja web ou mobile.
+
+Se precisar de explicações detalhadas sobre algum arquivo ou funcionalidade específica, basta pedir!
