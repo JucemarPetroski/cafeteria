@@ -40,6 +40,22 @@ public class UsuarioService {
         return converterParaResponseDto(usuarioSalvo);
     }
 
+    public String autenticarUsuario(String email, String senha) {
+        var usuarioOpt = usuarioRepository.findByEmail(email);
+        if (usuarioOpt.isPresent()) {
+            var usuario = usuarioOpt.get();
+            if (passwordEncoder.matches(senha, usuario.getSenha())) {
+                return usuario.getEmail();
+            } else if (senha.equals(usuario.getSenha())) {
+                // Plain text password found, re-encode it
+                usuario.setSenha(passwordEncoder.encode(senha));
+                usuarioRepository.save(usuario);
+                return usuario.getEmail();
+            }
+        }
+        return null;
+    }
+
     public UsuarioResponseDto atualizarUsuario(Long id, UsuarioCriarRequestDto dto) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));

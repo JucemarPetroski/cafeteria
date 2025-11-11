@@ -12,27 +12,19 @@ public class TokenServiceTest {
     public void gerarEValidarToken_deveRetornarSubject() throws Exception {
         TokenService tokenService = new TokenService();
 
-        // configurar campos privados via reflexão (simula @Value)
-        Field secretField = TokenService.class.getDeclaredField("secret");
+        // configurar campo privado via reflexão (simula @Value)
+        Field secretField = TokenService.class.getDeclaredField("secretKey");
         secretField.setAccessible(true);
-        secretField.set(tokenService, "segredo_teste_123456");
-
-        Field tempoField = TokenService.class.getDeclaredField("tempo");
-        tempoField.setAccessible(true);
-        tempoField.set(tokenService, 60L);
-
-        Field emissorField = TokenService.class.getDeclaredField("emissor");
-        emissorField.setAccessible(true);
-        emissorField.set(tokenService, "Jucemar");
+        secretField.set(tokenService, "segredo_teste_12345678901234567890123456789012");
 
         // criar DTO de login
         String email = "teste@exemplo.com";
         LoginRequestDto dto = new LoginRequestDto(email, "senha");
 
-        String token = tokenService.generateToken(dto);
+        String token = tokenService.generateToken(email);
         Assertions.assertNotNull(token, "Token não deve ser nulo");
 
-        String subject = tokenService.validarToken(token);
+        String subject = tokenService.getSubject(token);
         Assertions.assertEquals(email, subject, "Subject do token deve ser o email");
     }
 }

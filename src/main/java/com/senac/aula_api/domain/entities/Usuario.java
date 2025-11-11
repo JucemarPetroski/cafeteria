@@ -1,5 +1,6 @@
 package com.senac.aula_api.domain.entities;
 
+import com.senac.aula_api.application.dto.LoginRequestDto;
 import com.senac.aula_api.application.dto.usuario.UsuarioCriarRequestDto;
 import com.senac.aula_api.domain.valueobjects.CPF;
 import com.senac.aula_api.domain.valueobjects.EnumStatusUsuario;
@@ -59,6 +60,7 @@ public class Usuario {
     private String email;
 
     private EnumStatusUsuario status = EnumStatusUsuario.ATIVO;
+    private boolean acessoIrrestrito = false;
 
     // Papel do usuário para autorização (ex: ROLE_USER, ROLE_ADMIN)
     private String role = "ROLE_USER";

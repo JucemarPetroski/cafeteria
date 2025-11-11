@@ -3,14 +3,19 @@ package com.senac.aula_api.presentation;
 import com.senac.aula_api.application.dto.LoginRequestDto;
 import com.senac.aula_api.application.dto.LoginResponseDto;
 import com.senac.aula_api.application.services.TokenService;
+import com.senac.aula_api.domain.repository.UsuarioRepository;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,42 +26,35 @@ public class AuthController {
 
     @Autowired
     private TokenService tokenService;
-    
-    @Autowired
-    private com.senac.aula_api.domain.repository.UsuarioRepository usuarioRepository;
 
     @Autowired
-    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private com.senac.aula_api.application.services.UsuarioService usuarioService;
 
     @PostMapping("/login")
-    @Operation(summary = "Autenticação de usuário", description = "Método para fazer autenticação")
+    @Operation(summary = "Autenticação de usuário", description = "Método para autenticação de usuários do sistema")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) {
 
-        // Autenticação real: buscar usuário por email e comparar senha
-        var usuarioOpt = usuarioRepository.findByEmail(loginRequestDto.email());
-        if (usuarioOpt.isEmpty()) {
-            logger.warn("Autenticação falhou: usuário não encontrado para email={}", loginRequestDto.email());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não encontrado");
-        }
-        var usuario = usuarioOpt.get();
-        // verificar status
-        if (usuario.getStatus() != null && usuario.getStatus().toString().equalsIgnoreCase("INATIVO")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        boolean matches = passwordEncoder.matches(loginRequestDto.senha(), usuario.getSenha());
-        if (!matches) {
-            logger.warn("Autenticação falhou: senha inválida para email={}", loginRequestDto.email());
+        // Autenticar usuário
+        String email = usuarioService.autenticarUsuario(loginRequestDto.email(), loginRequestDto.senha());
+        if (email == null) {
+            logger.warn("Falha na autenticação para ({})", loginRequestDto.email());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         }
 
-        // gerar token para o usuário autenticado
-        var token = tokenService.generateToken(new com.senac.aula_api.application.dto.LoginRequestDto(usuario.getEmail(), usuario.getSenha()));
+        // Gerar token JWT seguro
+        var token = tokenService.generateToken(email);
         if (token == null) {
-            logger.error("TokenService retornou null para usuario={}", usuario.getEmail());
+            logger.error("Erro interno: TokenService retornou null para ({})", email);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao gerar token");
         }
-        logger.info("Token gerado com sucesso para usuario={}", usuario.getEmail());
+
+        logger.info("Usuário autenticado com sucesso: {}", email);
         return ResponseEntity.ok(new LoginResponseDto(token));
     }
 }
